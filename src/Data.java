@@ -52,7 +52,12 @@ public class Data {
 			}
 			long endTime = System.nanoTime();
 			long duration = endTime - startTime;
-			System.out.println("Write speed is " + count / (duration/1000000000.0) + " entries per second");
+			if(count==0)
+				System.out.println("Oops, but no entry is added.");
+			else{
+				System.out.println();
+				System.out.println("Write speed is " + count / (duration/1000000000.0) + " entries per second");
+			}
 			ds.closeConnection();
 		}
 		catch(Exception e){
@@ -62,19 +67,19 @@ public class Data {
 	
 	public static void update(){
 		try{
-			System.out.println("Fetching");
-			URL website = new URL("http://weather.gladstonefamily.net/cgi-bin/wxobservations.pl?site=AS221");
+			System.out.println("Downloading");
+			URL website = new URL("http://weather.gladstonefamily.net/cgi-bin/wxobservations.pl?site=AS221&days=56");
 		    ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 		    FileOutputStream fos = new FileOutputStream("wxobservations.csv");
 			long startTime = System.nanoTime();
 		    fos.getChannel().transferFrom(rbc, 0, 1 << 24);
 		    long endTime = System.nanoTime();
 		    fos.close();
-		    System.out.println("Finished fetching");
+		    System.out.println("Finished downloading");
 		    long duration = endTime - startTime;
 		    File f = new File("wxobservations.csv");
 		    double speed=(f.length()/1024.0)/(duration/1000000000);
-		    System.out.println("Speed is "+speed+"kb/s");
+		    System.out.println("Speed is "+speed+"kb/s, Size is "+f.length()/1024.0+"KB");
 		}
 		catch(Exception e){
 			e.printStackTrace();
