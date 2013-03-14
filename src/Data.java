@@ -3,60 +3,38 @@ import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.DatabaseMetaData;
-import com.csvreader.*;
 
+import com.csvreader.CsvReader;
 
 public class Data {
 	
 	public static void main(String[] args){
+		update();
 		try{
-			String sDriverName = "org.sqlite.JDBC";
-			Class.forName(sDriverName);
-			
-			String sTempDb = "data.db";
-			String sJdbc = "jdbc:sqlite";
-			String sDbUrl = sJdbc + ":" + sTempDb;
+			DataSet ds = new DataSet();
 			String sMakeInsert = "INSERT INTO data VALUES(";
-			String sMakeSelect = "SELECT time from data";
 			String time = "";
-			 
-			// create a database connection
-			Connection conn = DriverManager.getConnection(sDbUrl);
-			try{
-				Statement s = conn.createStatement();
-				try{
-					ResultSet rs = s.executeQuery(sMakeSelect);
-					rs.last();
-					try{
-						time = rs.getString("time");
-					}
-					finally{
-						rs.close();
-					}
-				}
-				finally{
-					s.close();
-				}
-			}
-			finally{
-				conn.close();
-			}
-			File src = new File("wxobservations.csv");
+			
 			CsvReader reader = new CsvReader("wxobservations.csv");
 			reader.readHeaders();
-			String[] headers = reader.getHeaders();
+			boolean flag=false;
 			while(reader.readRecord()){
 				String cur = reader.get("Time (UTC)");
-				
+				if(flag){
+					sMakeInsert+="\""+cur+"\",";
+					for(int i = 1; i < 7 ; i++){
+						sMakeInsert += reader.get(i);
+						sMakeInsert += (i==6?"":",");
+					}
+					sMakeInsert+=")";
+					//System.out.println("About to execute statement "+sMakeInsert);
+					ds.executeStmt(sMakeInsert);
+					sMakeInsert = "INSERT INTO data VALUES(";
+				}
+				if(time==cur)
+					flag=true;
 			}
-			
-			conn.close();
+			ds.closeConnection();
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -65,11 +43,19 @@ public class Data {
 	
 	public static void update(){
 		try{
+			System.out.println("Fetching");
+			long startTime = System.nanoTime();
 			URL website = new URL("http://weather.gladstonefamily.net/cgi-bin/wxobservations.pl?site=AS221");
 		    ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 		    FileOutputStream fos = new FileOutputStream("wxobservations.csv");
 		    fos.getChannel().transferFrom(rbc, 0, 1 << 24);
 		    fos.close();
+		    System.out.println("Finished fetching");
+		    long endTime = System.nanoTime();
+		    long duration = endTime - startTime;
+		    File f = new File("wxobservations.csv");
+		    double speed=(f.length()/1024.0)/(duration/1000000000);
+		    System.out.println("Speed is "+speed+"kb/s");
 		}
 		catch(Exception e){
 			e.printStackTrace();

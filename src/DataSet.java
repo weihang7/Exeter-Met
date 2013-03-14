@@ -6,13 +6,11 @@ import java.sql.Statement;
 	
 public class DataSet {
 
-	
-	 
-	public  String sDriver = "org.sqlite.JDBC"; 
-	public  String sUrl="data.db";
-	public  int iTimeout = 30;
-	public  Connection conn;
-	public  Statement statement;
+	private final String sDriver = "org.sqlite.JDBC"; 
+	private final String sUrl="jdbc:sqlite:data.db";
+	private final int iTimeout = 30;
+	private Connection conn;
+	private Statement statement;
 	
 	public DataSet() throws Exception{
 		setConnection();
@@ -37,14 +35,14 @@ public class DataSet {
 			setConnection();
 		}
 		statement = conn.createStatement();
-		statement.setQueryTimeout(iTimeout);  // set timeout to 30 sec.
+		statement.setQueryTimeout(iTimeout);
 	}
 	 
-	public  Statement getStatement() {
+	public Statement getStatement() {
 		return statement;
 	}
 	 
-	public  void executeStmt(String instruction) throws SQLException {
+	public void executeStmt(String instruction) throws SQLException {
 		statement.executeUpdate(instruction);
 	}
 	 
