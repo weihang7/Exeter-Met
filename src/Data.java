@@ -1,6 +1,8 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.sql.ResultSet;
@@ -29,7 +31,7 @@ public class Data {
 			reader.readHeaders();
 			boolean flag = false;
 			int count = 0;
-			long startTime = 0;
+			long startTime = System.nanoTime();
 			while(reader.readRecord()){
 				String cur = reader.get("Time (UTC)");
 				if(flag){
@@ -70,6 +72,14 @@ public class Data {
 			System.out.println("Downloading");
 			URL website = new URL("http://weather.gladstonefamily.net/cgi-bin/wxobservations.pl?site=AS221&days=56");
 		    ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+		    ByteBuffer testi = ByteBuffer.allocate(16);
+		    ByteBuffer testo = ByteBuffer.allocate(16);
+		    FileInputStream fis = new FileInputStream("wxobservations.csv");
+		    rbc.read(testi);
+		    fis.getChannel().read(testo);
+		    fis.close();
+		    if(testi.equals(testo))
+		    	return;
 		    FileOutputStream fos = new FileOutputStream("wxobservations.csv");
 			long startTime = System.nanoTime();
 		    fos.getChannel().transferFrom(rbc, 0, 1 << 24);
@@ -79,7 +89,7 @@ public class Data {
 		    long duration = endTime - startTime;
 		    File f = new File("wxobservations.csv");
 		    double speed=(f.length()/1024.0)/(duration/1000000000);
-		    System.out.println("Speed is "+speed+"kb/s, Size is "+f.length()/1024.0+"KB");
+		    System.out.println("Speed is "+speed+"KB/s, Size is "+f.length()/1024.0+"KB");
 		}
 		catch(Exception e){
 			e.printStackTrace();
