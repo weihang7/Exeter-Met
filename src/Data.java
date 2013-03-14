@@ -1,8 +1,10 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.sql.ResultSet;
@@ -72,14 +74,6 @@ public class Data {
 			System.out.println("Downloading");
 			URL website = new URL("http://weather.gladstonefamily.net/cgi-bin/wxobservations.pl?site=AS221&days=56");
 		    ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-		    ByteBuffer testi = ByteBuffer.allocate(16);
-		    ByteBuffer testo = ByteBuffer.allocate(16);
-		    FileInputStream fis = new FileInputStream("wxobservations.csv");
-		    rbc.read(testi);
-		    fis.getChannel().read(testo);
-		    fis.close();
-		    if(testi.equals(testo))
-		    	return;
 		    FileOutputStream fos = new FileOutputStream("wxobservations.csv");
 			long startTime = System.nanoTime();
 		    fos.getChannel().transferFrom(rbc, 0, 1 << 24);
