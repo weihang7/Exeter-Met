@@ -21,18 +21,20 @@ public class Data {
 			while(reader.readRecord()){
 				String cur = reader.get("Time (UTC)");
 				if(flag){
-					sMakeInsert+="\""+cur+"\",";
+					System.out.print(".");
+					sMakeInsert += "\"" + cur + "\",";
 					for(int i = 1; i < 7 ; i++){
 						sMakeInsert += reader.get(i);
 						sMakeInsert += (i==6?"":",");
 					}
 					sMakeInsert+=")";
-					//System.out.println("About to execute statement "+sMakeInsert);
 					ds.executeStmt(sMakeInsert);
 					sMakeInsert = "INSERT INTO data VALUES(";
 				}
-				if(time==cur)
+				if(time==cur){
 					flag=true;
+					System.out.println("Adding entries");
+				}
 			}
 			ds.closeConnection();
 		}
