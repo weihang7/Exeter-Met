@@ -46,14 +46,14 @@ public class Data {
 	public static void update(){
 		try{
 			System.out.println("Fetching");
-			long startTime = System.nanoTime();
 			URL website = new URL("http://weather.gladstonefamily.net/cgi-bin/wxobservations.pl?site=AS221");
 		    ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 		    FileOutputStream fos = new FileOutputStream("wxobservations.csv");
+			long startTime = System.nanoTime();
 		    fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+		    long endTime = System.nanoTime();
 		    fos.close();
 		    System.out.println("Finished fetching");
-		    long endTime = System.nanoTime();
 		    long duration = endTime - startTime;
 		    File f = new File("wxobservations.csv");
 		    double speed=(f.length()/1024.0)/(duration/1000000000);
