@@ -59,6 +59,7 @@ public class DataSet {
 	public void closeConnection() {
 		try {
 			conn.close();
+			System.out.println("Disconnected from database");
 		} 
 		catch (Exception e){
 			e.printStackTrace();

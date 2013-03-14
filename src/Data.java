@@ -3,6 +3,7 @@ import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.sql.ResultSet;
 
 import com.csvreader.CsvReader;
 
@@ -14,10 +15,21 @@ public class Data {
 			DataSet ds = new DataSet();
 			String sMakeInsert = "INSERT INTO data VALUES(";
 			String time = "";
-			
+			try{
+				ResultSet rs = ds.executeQry("SELECT * FROM data");
+				while(rs.next()){
+					time=rs.getString("time");
+				}
+				rs.close();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
 			CsvReader reader = new CsvReader("wxobservations.csv");
 			reader.readHeaders();
-			boolean flag=false;
+			boolean flag = false;
+			int count = 0;
+			long startTime = 0;
 			while(reader.readRecord()){
 				String cur = reader.get("Time (UTC)");
 				if(flag){
@@ -30,12 +42,17 @@ public class Data {
 					sMakeInsert+=")";
 					ds.executeStmt(sMakeInsert);
 					sMakeInsert = "INSERT INTO data VALUES(";
+					count++;
 				}
-				if(time==cur){
+				if(time.equals(cur)){
 					flag=true;
 					System.out.println("Adding entries");
+					startTime = System.nanoTime();
 				}
 			}
+			long endTime = System.nanoTime();
+			long duration = endTime - startTime;
+			System.out.println("Write speed is " + count / (duration/1000000000.0) + " entries per second");
 			ds.closeConnection();
 		}
 		catch(Exception e){
