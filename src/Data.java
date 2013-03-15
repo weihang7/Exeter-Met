@@ -1,10 +1,6 @@
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.sql.ResultSet;
@@ -60,7 +56,8 @@ public class Data {
 				System.out.println("Oops, but no entry is added.");
 			else{
 				System.out.println();
-				System.out.println("Write speed is " + count / (duration/1000000000.0) + " entries per second");
+				System.out.println("Write speed is " + count / 
+						(duration/1000000000.0) + " entries per second");
 			}
 			ds.closeConnection();
 		}
@@ -72,9 +69,12 @@ public class Data {
 	public static void update(){
 		try{
 			System.out.println("Downloading");
-			URL website = new URL("http://weather.gladstonefamily.net/cgi-bin/wxobservations.pl?site=AS221&days=56");
-		    ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-		    FileOutputStream fos = new FileOutputStream("wxobservations.csv");
+			URL website = new URL("http://weather.gladstonefamily.net/" +
+					"cgi-bin/wxobservations.pl?site=AS221&days=56");
+		    ReadableByteChannel rbc = Channels.newChannel(
+		    		website.openStream());
+		    FileOutputStream fos = new FileOutputStream(
+		    		"wxobservations.csv");
 			long startTime = System.nanoTime();
 		    fos.getChannel().transferFrom(rbc, 0, 1 << 24);
 		    long endTime = System.nanoTime();
@@ -83,7 +83,8 @@ public class Data {
 		    long duration = endTime - startTime;
 		    File f = new File("wxobservations.csv");
 		    double speed=(f.length()/1024.0)/(duration/1000000000);
-		    System.out.println("Speed is "+speed+"KB/s, Size is "+f.length()/1024.0+"KB");
+		    System.out.println("Speed is " + speed + "KB/s, Size is "
+		    		+ f.length()/1024.0+"KB");
 		}
 		catch(Exception e){
 			e.printStackTrace();
