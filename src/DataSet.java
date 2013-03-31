@@ -7,21 +7,27 @@ import java.sql.Statement;
 public class DataSet {
 
 	private final String sDriver = "org.sqlite.JDBC"; 
-	private final String sUrl="jdbc:sqlite:data.db";
+	private String sUrl="jdbc:sqlite:data.db";
 	private final int iTimeout = 30;
 	private Connection conn;
 	private Statement statement;
 	
-	public DataSet() throws Exception{
+	public DataSet() throws ClassNotFoundException, SQLException{
 		setConnection();
 		setStatement();
-		if(conn!=null)
-			System.out.println("Connected to database");
-		else
+		if(conn==null)
+			System.out.println("Connection failed");
+	}
+	
+	public DataSet(boolean ver) throws ClassNotFoundException, SQLException{
+		sUrl = "jdbc:sqlite:verify.db";
+		setConnection();
+		setStatement();
+		if(conn==null)
 			System.out.println("Connection failed");
 	}
 	 
-	public void setConnection() throws Exception {
+	public void setConnection() throws ClassNotFoundException, SQLException {
 		Class.forName(sDriver);
 		conn = DriverManager.getConnection(sUrl);
 	}
@@ -30,10 +36,7 @@ public class DataSet {
 		return conn;
 	}
 	 
-	public void setStatement() throws Exception {
-		if (conn == null) {
-			setConnection();
-		}
+	public void setStatement() throws SQLException {
 		statement = conn.createStatement();
 		statement.setQueryTimeout(iTimeout);
 	}
@@ -56,14 +59,8 @@ public class DataSet {
 		return statement.executeQuery(instruction);
 	} 
 	 
-	public void closeConnection() {
-		try {
-			conn.close();
-			System.out.println("Disconnected from database");
-		} 
-		catch (Exception e){
-			e.printStackTrace();
-		}
+	public void closeConnection() throws SQLException{
+		conn.close();
 	}
 	 
 }

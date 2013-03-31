@@ -46,45 +46,35 @@ public class Data {
 				}
 				if(time.equals(cur)){
 					flag=true;
-					System.out.println("Adding entries");
 					startTime = System.nanoTime();
 				}
 			}
 			long endTime = System.nanoTime();
 			long duration = endTime - startTime;
-			if(count==0)
-				System.out.println("Oops, but no entry is added.");
-			else{
+			if(count!=0)
 				System.out.println();
-				System.out.println("Write speed is " + count / 
-						(duration/1000000000.0) + " entries per second");
-			}
+			System.out.println("Write speed is " + count / (duration/1000000000.0) + " entries per second");
 			ds.closeConnection();
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
+		System.out.println("Successfully updated database");
 	}
 	
 	public static void update(){
 		try{
-			System.out.println("Downloading");
-			URL website = new URL("http://weather.gladstonefamily.net/" +
-					"cgi-bin/wxobservations.pl?site=AS221&days=56");
-		    ReadableByteChannel rbc = Channels.newChannel(
-		    		website.openStream());
-		    FileOutputStream fos = new FileOutputStream(
-		    		"wxobservations.csv");
+			URL website = new URL("http://weather.gladstonefamily.net/cgi-bin/wxobservations.pl?site=AS221&days=56");
+		    ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+		    FileOutputStream fos = new FileOutputStream("wxobservations.csv");
 			long startTime = System.nanoTime();
 		    fos.getChannel().transferFrom(rbc, 0, 1 << 24);
 		    long endTime = System.nanoTime();
 		    fos.close();
-		    System.out.println("Finished downloading");
 		    long duration = endTime - startTime;
 		    File f = new File("wxobservations.csv");
-		    double speed=(f.length()/1024.0)/(duration/1000000000);
-		    System.out.println("Speed is " + speed + "KB/s, Size is "
-		    		+ f.length()/1024.0+"KB");
+		    double speed=(f.length()/1024.0)/(duration/1000000000.0);
+		    System.out.println("Speed is " + speed + "KB/s");
 		}
 		catch(Exception e){
 			e.printStackTrace();
